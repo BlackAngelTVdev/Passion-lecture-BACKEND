@@ -14,3 +14,7 @@ router.get('/swagger.json', async () => {
 router.get('/docs', async () => {
   return AutoSwagger.default.ui('/swagger.json', swaggerConfig)
 })
+
+router.get('/', ({ response }) => {
+  return response.redirect().toPath('/docs')
+})

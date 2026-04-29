@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Livre from '#models/livre'
+import { createLivreValidator, updateLivreValidator } from '#validators/livre'
 
 export default class LivresController {
   async index({ response }: HttpContext) {
@@ -8,7 +9,7 @@ export default class LivresController {
   }
 
   async store({ request, response }: HttpContext) {
-    const data = request.all()
+    const data = await request.validateUsing(createLivreValidator)
     const livre = await Livre.create(data)
     return response.created(livre)
   }
@@ -20,7 +21,7 @@ export default class LivresController {
 
   async update({ params, request, response }: HttpContext) {
     const livre = await Livre.findOrFail(params.id)
-    const data = request.all()
+    const data = await request.validateUsing(updateLivreValidator)
 
     livre.merge(data)
     await livre.save()
