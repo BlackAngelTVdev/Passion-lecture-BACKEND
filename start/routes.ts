@@ -8,9 +8,6 @@
 */
 
 import router from '@adonisjs/core/services/router'
+const LivresController = () => import('#controllers/livres_controller')
 
-router.get('/', async () => {
-  return {
-    hello: 'world',
-  }
-})
+router.resource('livres', LivresController).apiOnly()
