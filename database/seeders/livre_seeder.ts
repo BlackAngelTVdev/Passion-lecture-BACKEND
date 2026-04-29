@@ -12,6 +12,7 @@ export default class extends BaseSeeder {
         epub: 'etranger.epub',
         resume: "Une histoire sur l'absurde.",
         nbPages: 159,
+        userId: 1,
       },
       {
         titre: '1984',
@@ -21,6 +22,7 @@ export default class extends BaseSeeder {
         epub: '1984.epub',
         resume: 'Big Brother vous regarde.',
         nbPages: 328,
+        userId: 1,
       },
     ])
   }

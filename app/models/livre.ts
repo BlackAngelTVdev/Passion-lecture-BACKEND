@@ -1,11 +1,14 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
-import type { HasMany } from '@adonisjs/lucid/types/relations'
+import { BaseModel, column, hasMany, belongsTo } from '@adonisjs/lucid/orm'
+import type { HasMany, BelongsTo } from '@adonisjs/lucid/types/relations'
 import Commentaire from '#models/commentaire'
+import User from '#models/user' // N'oublie pas l'import
 
 export default class Livre extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
+  @column()
+  declare userId: number
 
   @column()
   declare titre: string
@@ -43,6 +46,10 @@ export default class Livre extends BaseModel {
   /**
    * Relations
    */
+
+  @belongsTo(() => User)
+  declare user: BelongsTo<typeof User>
+
   @hasMany(() => Commentaire)
   declare commentaires: HasMany<typeof Commentaire>
 }
