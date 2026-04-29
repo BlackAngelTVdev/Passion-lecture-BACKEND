@@ -18,15 +18,15 @@ router.get('/', ({ response }) => {
   return response.redirect().toPath('/docs')
 })
 // Authentication routes (public)
-router.post('/auth/login', [AuthController, 'login'])
-router.post('/auth/register', [AuthController, 'register'])
+router.post('/login', [AuthController, 'login'])
+router.post('/register', [AuthController, 'register'])
 
 // Protected routes (require authentication)
 router
   .group(() => {
     // Auth routes
-    router.post('/auth/logout', [AuthController, 'logout'])
-    router.get('/auth/profile', [AuthController, 'profile'])
+    router.post('/logout', [AuthController, 'logout'])
+    router.get('/profile', [AuthController, 'profile'])
 
     // Books routes
     router.resource('books', LivresController).apiOnly()
