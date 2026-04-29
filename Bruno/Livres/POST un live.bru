@@ -1,0 +1,23 @@
+meta {
+  name: POST un live
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:3333/books
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "titre": "Le Petit Prince",
+    "auteur": "Antoine de Saint-Exupéry",
+    "categorie": "Conte",
+    "editeur": "Reynal & Hitchcock",
+    "epub": "petit_prince.epub",
+    "resume": "Un pilote s'écrase dans le désert...",
+    "nb_pages": 96
+  }
+}
