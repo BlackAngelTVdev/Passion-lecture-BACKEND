@@ -1,0 +1,18 @@
+meta {
+  name: EDIT un livre
+  type: http
+  seq: 3
+}
+
+put {
+  url: http://localhost:3333/livres/1
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "titre": "Le Petit Prince - Edition Spéciale",
+    "nb_pages": 110
+  }
+}

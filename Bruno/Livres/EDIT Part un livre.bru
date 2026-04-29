@@ -1,0 +1,18 @@
+meta {
+  name: EDIT Part un livre
+  type: http
+  seq: 4
+}
+
+patch {
+  url: http://localhost:3333/livres/1
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "titre": "Le Petit Spéciale",
+    "nb_pages": 110
+  }
+}
