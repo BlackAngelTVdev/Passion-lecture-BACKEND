@@ -4,7 +4,7 @@ export default {
   uiUrl: 'docs',
   specUrl: 'swagger.json',
   title: 'Passion Lecture API',
-  version: '1.0.0',
+  version: 'Bêt@ 0.1.8',
   description: "Documentation de l'API Backend",
   tagIndex: 2,
   snakeCase: true,

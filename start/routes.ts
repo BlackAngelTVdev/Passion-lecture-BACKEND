@@ -22,11 +22,13 @@ router.post('/auth/login', [AuthController, 'login'])
 router.post('/auth/register', [AuthController, 'register'])
 
 // Protected routes (require authentication)
-router.group(() => {
-  // Auth routes
-  router.post('/auth/logout', [AuthController, 'logout'])
-  router.get('/auth/profile', [AuthController, 'profile'])
+router
+  .group(() => {
+    // Auth routes
+    router.post('/auth/logout', [AuthController, 'logout'])
+    router.get('/auth/profile', [AuthController, 'profile'])
 
-  // Books routes
-  router.resource('books', LivresController).apiOnly()
-}).middleware(() => import('#middleware/auth_middleware'))
+    // Books routes
+    router.resource('books', LivresController).apiOnly()
+  })
+  .middleware(() => import('#middleware/auth_middleware'))
