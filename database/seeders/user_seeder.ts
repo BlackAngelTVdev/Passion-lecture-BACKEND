@@ -6,11 +6,11 @@ export default class extends BaseSeeder {
 const users = [{
       username: 'Admin',
       password: 'Admin',
-      isadmin: true,
+      admin: true,
     },{
       username: 'Test',
       password: '1234',
-      isadmin: false,
+      admin: false,
     }
   ]
 
