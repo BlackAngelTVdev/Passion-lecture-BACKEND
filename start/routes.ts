@@ -5,8 +5,6 @@ import swaggerConfig from '#config/swagger'
 const LivresController = () => import('#controllers/livres_controller')
 const AuthController = () => import('#controllers/auth_controller')
 
-router.resource('books', LivresController).apiOnly()
-
 // Routes Swagger
 router.get('/swagger.json', async () => {
   return AutoSwagger.default.docs(router.toJSON(), swaggerConfig)
