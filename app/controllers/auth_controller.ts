@@ -1,12 +1,14 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
+// Assuming you created a validator: 'node ace make:validator auth'
+import { registerValidator, loginValidator } from '#validators/auth'
 
 export default class AuthController {
   /**
-   * Login user and return JWT token
+   * Login user and return token
    */
   async login({ request, response }: HttpContext) {
-    const { username, password } = request.only(['username', 'password'])
+    const { username, password } = await request.validateUsing(loginValidator)
 
     try {
       const user = await User.verifyCredentials(username, password)
@@ -14,13 +16,8 @@ export default class AuthController {
 
       return response.ok({
         message: 'Login successful',
-        user: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          admin: user.admin,
-        },
-        token: token.toJSON(),
+        token: token.value, // Just the string token
+        user: user.serialize(), // Uses the serialize hook in your model
       })
     } catch (error) {
       return response.unauthorized({ message: 'Invalid credentials' })
@@ -28,11 +25,30 @@ export default class AuthController {
   }
 
   /**
-   * Logout user (revoke token)
+   * Register a new user
+   */
+  async register({ request, response }: HttpContext) {
+    const payload = await request.validateUsing(registerValidator)
+
+    const user = await User.create(payload)
+    const token = await User.accessTokens.create(user)
+
+    return response.created({
+      message: 'User registered successfully',
+      token: token.value,
+      user: user.serialize(),
+    })
+  }
+
+  /**
+   * Logout user (revoke current token)
    */
   async logout({ auth, response }: HttpContext) {
     const user = auth.user!
-    await User.accessTokens.delete(user, auth.user!.currentAccessToken.identifier)
+    // Get the specific token used for this request
+    const token = auth.user!.currentAccessToken
+    
+    await User.accessTokens.delete(user, token.identifier)
 
     return response.ok({ message: 'Logout successful' })
   }
@@ -41,62 +57,7 @@ export default class AuthController {
    * Get current user profile
    */
   async profile({ auth, response }: HttpContext) {
-    const user = auth.user!
-
-    return response.ok({
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      admin: user.admin,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    })
-  }
-
-  /**
-   * Register a new user
-   */
-  async register({ request, response }: HttpContext) {
-    const { username, email, password } = request.only(['username', 'email', 'password'])
-
-    // Basic validation
-    if (!username || !email || !password) {
-      return response.badRequest({ message: 'Username, email and password are required' })
-    }
-
-    if (password.length < 8) {
-      return response.badRequest({ message: 'Password must be at least 8 characters long' })
-    }
-    
-    // Check if user already exists
-    const existingUser = await User.findBy('username', username)
-    if (existingUser) {
-      return response.badRequest({ message: 'Username already exists' })
-    }
-
-    const existingEmail = await User.findBy('email', email)
-    if (existingEmail) {
-      return response.badRequest({ message: 'Email already exists' })
-    }
-
-    const user = await User.create({
-      username,
-      email,
-      password,
-      admin: false,
-    })
-
-    const token = await User.accessTokens.create(user)
-
-    return response.created({
-      message: 'User registered successfully',
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        admin: user.admin,
-      },
-      token: token.toJSON(),
-    })
+    // auth.authenticate() middleware should be on the route to ensure auth.user exists
+    return response.ok(auth.user!.serialize())
   }
 }
