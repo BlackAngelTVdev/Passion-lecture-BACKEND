@@ -6,10 +6,20 @@ meta {
 
 post {
   url: http://localhost:3333/register
-  body: none
+  body: json
   auth: inherit
+}
+
+body:json {
+  {
+    "username": "admin",
+    "email":"admin@gmail.com",
+    "password": "admin123",
+    "admin":"true"
+  }
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }
