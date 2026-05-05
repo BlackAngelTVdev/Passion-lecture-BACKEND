@@ -1,4 +1,4 @@
-// config/swagger.ts
+import app from '@adonisjs/core/services/app'
 
 export default {
   uiUrl: 'docs',
@@ -8,7 +8,7 @@ export default {
   description: "Documentation de l'API Backend",
   tagIndex: 2,
   snakeCase: true,
-  path: 'app/controllers',
+  path: app.makePath(),
   ignore: [],
   common: {
     parameters: {},
