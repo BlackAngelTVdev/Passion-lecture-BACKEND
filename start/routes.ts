@@ -29,8 +29,8 @@ router
   .group(() => {
     // Auth routes
     router.post('/logout', [AuthController, 'logout'])
-    router.get('/users/:id', [AuthController, 'userDetail'])
     // Books routes
   })
   .middleware(() => import('#middleware/auth_middleware'))
+  router.get('/users/:id', [AuthController, 'userDetail'])
   router.resource('books', LivresController).apiOnly()
