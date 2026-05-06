@@ -29,6 +29,7 @@ router
     router.get('/profile', [AuthController, 'profile'])
 
     // Books routes
-    router.resource('books', LivresController).apiOnly()
   })
   .middleware(() => import('#middleware/auth_middleware'))
+  
+  router.resource('books', LivresController).apiOnly()
