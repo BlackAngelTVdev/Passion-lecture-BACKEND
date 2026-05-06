@@ -8,8 +8,16 @@ export default class LivresController {
     return response.ok(livres)
   }
 
-  async store({ request, response }: HttpContext) {
+  async store({ request, response, auth }: HttpContext) {
     const data = await request.validateUsing(createLivreValidator)
+
+    // Attach authenticated user id server-side to avoid relying on client-provided value
+    if (auth.user) {
+      // Ensure we write the expected property name for the model
+      // data may come with userId (camelCase) or user_id depending on client
+      data.userId = (auth.user as any).id
+    }
+
     const livre = await Livre.create(data)
     return response.created(livre)
   }
