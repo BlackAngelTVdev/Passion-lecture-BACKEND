@@ -2,7 +2,7 @@ import vine from '@vinejs/vine'
 
 export const createLivreValidator = vine.compile(
   vine.object({
-    userId: vine.number().positive().optional(),
+    userId: vine.number().positive(),
     titre: vine.string().trim().minLength(2),
     auteur: vine.string().trim(),
     categorie: vine.string().trim(),

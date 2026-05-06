@@ -56,8 +56,18 @@ export default class AuthController {
   /**
    * Get current user profile
    */
-  async profile({ auth, response }: HttpContext) {
-    // auth.authenticate() middleware should be on the route to ensure auth.user exists
-    return response.ok(auth.user!.serialize())
+
+  async users({ response }: HttpContext) {
+    const users = await User.query().select('id', 'username', 'admin', 'created_at')
+    return response.ok(users)
+  }
+  async userDetail({ params, response }: HttpContext) {
+    const user = await User.findOrFail(params.id)
+    return response.ok({
+      id: user.id,
+      username: user.username,
+      admin: user.admin,
+      createdAt: user.createdAt,
+    })
   }
 }
