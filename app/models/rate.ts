@@ -26,7 +26,7 @@ export default class Rate extends BaseModel {
   // Relations
   @belongsTo(() => User)
   declare auteur: BelongsTo<typeof User>
-  
+
   @belongsTo(() => Livre)
   declare livre: BelongsTo<typeof Livre>
 }

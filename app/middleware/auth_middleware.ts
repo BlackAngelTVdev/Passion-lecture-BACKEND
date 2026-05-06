@@ -20,7 +20,7 @@ export default class AuthMiddleware {
     } catch (error) {
       return ctx.response.unauthorized({
         message: 'Authentication required',
-        error: 'No valid token provided'
+        error: 'No valid token provided',
       })
     }
   }

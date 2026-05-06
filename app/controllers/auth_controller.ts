@@ -47,7 +47,7 @@ export default class AuthController {
     const user = auth.user!
     // Get the specific token used for this request
     const token = auth.user!.currentAccessToken
-    
+
     await User.accessTokens.delete(user, token.identifier)
 
     return response.ok({ message: 'Logout successful' })
