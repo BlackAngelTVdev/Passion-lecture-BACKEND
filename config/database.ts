@@ -1,8 +1,12 @@
 import env from '#start/env'
+import app from '@adonisjs/core/services/app'
 import { defineConfig } from '@adonisjs/lucid'
 
+const dbType = env.get('DB_TYPE') === 'sqlite' ? 'sqlite' : 'mysql'
+const dbDatabase = env.get('DB_DATABASE') ?? 'database.sqlite'
+
 const dbConfig = defineConfig({
-  connection: 'mysql',
+  connection: dbType,
   connections: {
     mysql: {
       client: 'mysql2',
@@ -13,6 +17,17 @@ const dbConfig = defineConfig({
         password: env.get('DB_PASSWORD'),
         database: env.get('DB_DATABASE'),
       },
+      migrations: {
+        naturalSort: true,
+        paths: ['database/migrations'],
+      },
+    },
+    sqlite: {
+      client: 'better-sqlite3',
+      connection: {
+        filename: app.makePath(dbDatabase),
+      },
+      useNullAsDefault: true,
       migrations: {
         naturalSort: true,
         paths: ['database/migrations'],
