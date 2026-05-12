@@ -1,38 +1,117 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import Commentaire from '#models/commentaire'
+import Livre from '#models/livre'
+import { createCommentaireValidator } from '#validators/commentaire'
 
 export default class CommentairesController {
-  /**
-   * Display a list of resource
-   */
-  async index({}: HttpContext) {}
+	async index({ params, response }: HttpContext) {
+		await Livre.findOrFail(params.id)
 
-  /**
-   * Display form to create a new record
-   */
-  async create({}: HttpContext) {}
+		const commentaires = await Commentaire.query()
+			.where('livre_id', params.id)
+			.preload('auteur', (userQuery) => {
+				userQuery.select(['id', 'username'])
+			})
+			.orderBy('created_at', 'desc')
 
-  /**
-   * Handle form submission for the create action
-   */
-  async store({ request }: HttpContext) {}
+		return response.ok(commentaires)
+	}
 
-  /**
-   * Show individual record
-   */
-  async show({ params }: HttpContext) {}
+	async show({ params, response }: HttpContext) {
+		const commentaire = await Commentaire.query()
+			.where('id', params.commentId)
+			.where('livre_id', params.id)
+			.preload('auteur', (userQuery) => {
+				userQuery.select(['id', 'username'])
+			})
+			.firstOrFail()
 
-  /**
-   * Edit individual record
-   */
-  async edit({ params }: HttpContext) {}
+		return response.ok(commentaire)
+	}
 
-  /**
-   * Handle form submission for the edit action
-   */
-  async update({ params, request }: HttpContext) {}
+	async store({ params, request, response, auth }: HttpContext) {
+		const { contenu } = await request.validateUsing(createCommentaireValidator)
+		await Livre.findOrFail(params.id)
 
-  /**
-   * Delete record
-   */
-  async destroy({ params }: HttpContext) {}
+		try {
+			await auth.authenticate()
+		} catch {
+			return response.unauthorized({
+				message: 'Authentication required',
+				error: 'No valid token provided',
+			})
+		}
+
+		const commentaire = await Commentaire.create({
+			contenu,
+			livreId: Number(params.id),
+			userId: auth.user!.id,
+		})
+
+		await commentaire.load('auteur', (userQuery) => {
+			userQuery.select(['id', 'username'])
+		})
+
+		return response.created(commentaire)
+	}
+
+	async update({ params, request, response, auth }: HttpContext) {
+		const { contenu } = await request.validateUsing(createCommentaireValidator)
+
+		try {
+			await auth.authenticate()
+		} catch {
+			return response.unauthorized({
+				message: 'Authentication required',
+				error: 'No valid token provided',
+			})
+		}
+
+		const commentaire = await Commentaire.query()
+			.where('id', params.commentId)
+			.where('livre_id', params.id)
+			.firstOrFail()
+
+		const isOwner = commentaire.userId === auth.user!.id
+		const isAdmin = auth.user!.admin === true
+
+		if (!isOwner && !isAdmin) {
+			return response.forbidden({ message: 'Not allowed to update this comment' })
+		}
+
+		commentaire.contenu = contenu
+		await commentaire.save()
+
+		await commentaire.load('auteur', (userQuery) => {
+			userQuery.select(['id', 'username'])
+		})
+
+		return response.ok(commentaire)
+	}
+
+	async destroy({ params, response, auth }: HttpContext) {
+		try {
+			await auth.authenticate()
+		} catch {
+			return response.unauthorized({
+				message: 'Authentication required',
+				error: 'No valid token provided',
+			})
+		}
+
+		const commentaire = await Commentaire.query()
+			.where('id', params.commentId)
+			.where('livre_id', params.id)
+			.firstOrFail()
+
+		const isOwner = commentaire.userId === auth.user!.id
+		const isAdmin = auth.user!.admin === true
+
+		if (!isOwner && !isAdmin) {
+			return response.forbidden({ message: 'Not allowed to delete this comment' })
+		}
+
+		await commentaire.delete()
+		return response.noContent()
+	}
 }

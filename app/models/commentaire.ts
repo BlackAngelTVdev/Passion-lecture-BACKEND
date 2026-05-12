@@ -11,10 +11,10 @@ export default class Commentaire extends BaseModel {
   @column()
   declare contenu: string
 
-  @column()
+  @column({ columnName: 'user_id' })
   declare userId: number
 
-  @column()
+  @column({ columnName: 'livre_id' })
   declare livreId: number
 
   @column.dateTime({ autoCreate: true })
@@ -24,9 +24,13 @@ export default class Commentaire extends BaseModel {
   declare updatedAt: DateTime
 
   // Relations
-  @belongsTo(() => User)
+  @belongsTo(() => User, {
+    foreignKey: 'userId',
+  })
   declare auteur: BelongsTo<typeof User>
 
-  @belongsTo(() => Livre)
+  @belongsTo(() => Livre, {
+    foreignKey: 'livreId',
+  })
   declare livre: BelongsTo<typeof Livre>
 }
