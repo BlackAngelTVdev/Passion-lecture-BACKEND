@@ -3,6 +3,40 @@ import User from '#models/user'
 // Assuming you created a validator: 'node ace make:validator auth'
 import { registerValidator, loginValidator } from '#validators/auth'
 
+const serializePublicUser = (user: User) => {
+  const serialized = user.serialize() as {
+    id: number
+    username: string | null
+    admin?: boolean | number
+    createdAt?: string | null
+  }
+
+  return {
+    id: serialized.id,
+    username: serialized.username,
+    admin: Boolean(serialized.admin),
+    createdAt: serialized.createdAt ?? null,
+  }
+}
+
+const resolveTokenValue = (token: any) => {
+  if (typeof token?.value === 'string') {
+    return token.value
+  }
+
+  if (token?.value && typeof token.value === 'object' && 'release' in token.value) {
+    return token.value.release()
+  }
+
+  return ''
+}
+
+const buildAuthResponse = (user: User, token: any) => ({
+  token: resolveTokenValue(token),
+  accessToken: resolveTokenValue(token),
+  user: serializePublicUser(user),
+})
+
 export default class AuthController {
   /**
    * Login user and return token
@@ -16,8 +50,7 @@ export default class AuthController {
 
       return response.ok({
         message: 'Login successful',
-        token: token.value, // Just the string token
-        user: user.serialize(), // Uses the serialize hook in your model
+        ...buildAuthResponse(user, token),
       })
     } catch (error) {
       return response.unauthorized({ message: 'Invalid credentials' })
@@ -35,8 +68,7 @@ export default class AuthController {
 
     return response.created({
       message: 'User registered successfully',
-      token: token.value,
-      user: user.serialize(),
+      ...buildAuthResponse(user, token),
     })
   }
 
@@ -53,21 +85,27 @@ export default class AuthController {
     return response.ok({ message: 'Logout successful' })
   }
 
+  async profile({ auth, response }: HttpContext) {
+    await auth.authenticate()
+    return response.ok(serializePublicUser(auth.user!))
+  }
+
   /**
    * Get current user profile
    */
 
   async users({ response }: HttpContext) {
     const users = await User.query().select('id', 'username', 'admin', 'created_at')
-    return response.ok(users)
+    const publicUsers = users.map((user) => serializePublicUser(user))
+    return response.ok(publicUsers)
   }
   async userDetail({ params, response }: HttpContext) {
     const user = await User.findOrFail(params.id)
     return response.ok({
       id: user.id,
       username: user.username,
-      admin: user.admin,
-      createdAt: user.createdAt,
+      admin: Boolean(user.admin),
+      createdAt: user.createdAt?.toISO() ?? null,
     })
   }
 }
