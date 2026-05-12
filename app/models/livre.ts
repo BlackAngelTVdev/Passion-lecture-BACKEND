@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 import { BaseModel, column, hasMany, belongsTo } from '@adonisjs/lucid/orm'
 import type { HasMany, BelongsTo } from '@adonisjs/lucid/types/relations'
 import Commentaire from '#models/commentaire'
+import Rate from '#models/rate'
 import User from '#models/user' // N'oublie pas l'import
 
 export default class Livre extends BaseModel {
@@ -50,6 +51,11 @@ export default class Livre extends BaseModel {
   @belongsTo(() => User)
   declare user: BelongsTo<typeof User>
 
-  @hasMany(() => Commentaire)
+  @hasMany(() => Commentaire, {
+    foreignKey: 'livreId',
+  })
   declare commentaires: HasMany<typeof Commentaire>
+
+  @hasMany(() => Rate)
+  declare rates: HasMany<typeof Rate>
 }

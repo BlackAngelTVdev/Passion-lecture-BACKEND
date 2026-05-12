@@ -24,9 +24,13 @@ export default class Rate extends BaseModel {
   declare updatedAt: DateTime
 
   // Relations
-  @belongsTo(() => User)
+  @belongsTo(() => User, {
+    foreignKey: 'userId',
+  })
   declare auteur: BelongsTo<typeof User>
 
-  @belongsTo(() => Livre)
+  @belongsTo(() => Livre, {
+    foreignKey: 'livreId',
+  })
   declare livre: BelongsTo<typeof Livre>
 }
