@@ -4,7 +4,13 @@ import { createLivreValidator, updateLivreValidator } from '#validators/livre'
 
 export default class LivresController {
   async index({ response }: HttpContext) {
-    const livres = await Livre.all()
+    const livres = await Livre.query()
+      .preload('commentaires', (commentQuery) => {
+        commentQuery.preload('auteur', (userQuery) => {
+          userQuery.select(['id', 'username'])
+        })
+      })
+      .preload('rates')
     return response.ok(livres)
   }
 
@@ -23,7 +29,15 @@ export default class LivresController {
   }
 
   async show({ params, response }: HttpContext) {
-    const livre = await Livre.findOrFail(params.id)
+    const livre = await Livre.query()
+      .where('id', params.id)
+      .preload('commentaires', (commentQuery) => {
+        commentQuery.preload('auteur', (userQuery) => {
+          userQuery.select(['id', 'username'])
+        })
+      })
+      .preload('rates')
+      .firstOrFail()
     return response.ok(livre)
   }
 
