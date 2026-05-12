@@ -27,7 +27,7 @@ export default class Rate extends BaseModel {
   @belongsTo(() => User, {
     foreignKey: 'userId',
   })
-  declare auteur: BelongsTo<typeof User>
+  declare user: BelongsTo<typeof User>
 
   @belongsTo(() => Livre, {
     foreignKey: 'livreId',
