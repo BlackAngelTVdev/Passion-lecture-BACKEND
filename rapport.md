@@ -85,83 +85,11 @@ L'API REST expose les endpoints suivants :
 ---
 
 ### 2.2 Modèle de Données (MCD)
-
-```
-USER
-├── id (PK)
-├── username (UNIQUE)
-├── email (UNIQUE)
-├── password (hashed)
-├── admin (boolean)
-├── createdAt
-├── updatedAt
-
-LIVRE
-├── id (PK)
-├── user_id (FK -> USER)
-├── titre
-├── auteur
-├── categorie
-├── editeur
-├── epub
-├── resume
-├── nbPages
-├── extraitPdf
-├── imageCouverture
-├── createdAt
-├── updatedAt
-
-COMMENTAIRE
-├── id (PK)
-├── livre_id (FK -> LIVRE)
-├── user_id (FK -> USER)
-├── contenu
-├── createdAt
-├── updatedAt
-
-RATE
-├── id (PK)
-├── livre_id (FK -> LIVRE)
-├── user_id (FK -> USER)
-├── value (0-5)
-├── createdAt
-├── updatedAt
-
-ACCESS_TOKENS
-├── id (PK)
-├── tokenable_id (FK -> USER)
-├── name
-├── type
-├── token (hashed)
-├── abilities (json)
-├── createdAt
-├── updatedAt
-├── lastUsedAt
-├── expiresAt
-```
-
-**Relations:**
-- USER (1) -> (N) LIVRE (hasMany)
-- USER (1) -> (N) COMMENTAIRE (hasMany)
-- USER (1) -> (N) RATE (hasMany)
-- LIVRE (1) -> (N) COMMENTAIRE (hasMany)
-- LIVRE (1) -> (N) RATE (hasMany)
-- COMMENTAIRE (N) -> (1) USER (belongsTo)
-- COMMENTAIRE (N) -> (1) LIVRE (belongsTo)
-- RATE (N) -> (1) USER (belongsTo)
-- RATE (N) -> (1) LIVRE (belongsTo)
-
----
+![alt text](doc/image.png)
 
 ### 2.3 Modèle Logique (MLD)
 
-```
-USER(id, username, email, password, admin, createdAt, updatedAt)
-LIVRE(id, user_id*, titre, auteur, categorie, editeur, epub, resume, nbPages, extraitPdf, imageCouverture, createdAt, updatedAt)
-COMMENTAIRE(id, livre_id*, user_id*, contenu, createdAt, updatedAt)
-RATE(id, livre_id*, user_id*, value, createdAt, updatedAt)
-ACCESS_TOKENS(id, tokenable_id*, name, type, token, abilities, createdAt, updatedAt, lastUsedAt, expiresAt)
-```
+![alt text](doc/image-1.png)
 
 ---
 
@@ -170,8 +98,88 @@ ACCESS_TOKENS(id, tokenable_id*, name, type, token, abilities, createdAt, update
 Base de données SQLite avec les tables:
 
 ```sql
--- Voir fichiers migrations dans database/migrations/
--- Les tables sont créées automatiquement via les migrations Lucid ORM
+-- 1. Création de la Database
+CREATE DATABASE MonSuperProjet;
+USE MonSuperProjet;
+
+-- 2. Table des Catégories (Simple et indépendante)
+CREATE TABLE categories (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nom VARCHAR(50) NOT NULL
+);
+
+-- 3. Table des Utilisateurs
+CREATE TABLE utilisateurs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    pseudo VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    date_inscription DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 4. Table des Articles (Avec relations FK)
+CREATE TABLE articles (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    titre VARCHAR(255) NOT NULL,
+    contenu TEXT,
+    auteur_id INT,
+    categorie_id INT,
+    -- Relation : Un article est écrit par un utilisateur
+    CONSTRAINT fk_auteur FOREIGN KEY (auteur_id) 
+        REFERENCES utilisateurs(id) ON DELETE CASCADE,
+    -- Relation : Un article appartient à une catégorie
+    CONSTRAINT fk_categorie FOREIGN KEY (categorie_id) 
+        REFERENCES categories(id) ON DELETE SET NULL
+);
+
+CREATE TABLE users(
+   id INT AUTO_INCREMENT,
+   pseudo VARCHAR(50) NOT NULL,
+   email VARCHAR(100) NOT NULL,
+   password VARCHAR(255) NOT NULL,
+   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+   PRIMARY KEY(id),
+   UNIQUE(email)
+);
+
+CREATE TABLE books(
+   id INT AUTO_INCREMENT,
+   titre VARCHAR(255) NOT NULL,
+   resume TEXT,
+   nb_pages INT,
+   extrait_pdf VARCHAR(255),
+   image_couverture VARCHAR(255),
+   auteur_nom VARCHAR(100),
+   auteur_prenom VARCHAR(100),
+   categorie VARCHAR(255),
+   editeur VARCHAR(100),
+   annee_edition INT,
+   user_id INT,
+   PRIMARY KEY(id),
+   FOREIGN KEY(user_id) REFERENCES users(id)
+);
+
+CREATE TABLE reviews(
+   id INT AUTO_INCREMENT,
+   note INT CHECK(note BETWEEN 0 AND 5),
+   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+   book_id INT,
+   user_id INT,
+   PRIMARY KEY(id),
+   FOREIGN KEY(book_id) REFERENCES books(id),
+   FOREIGN KEY(user_id) REFERENCES users(id)
+);
+
+CREATE TABLE Comment(
+   id INT AUTO_INCREMENT,
+   commentaire TEXT,
+   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+   id_user_id INT,
+   id_book_id INT,
+   PRIMARY KEY(id),
+   FOREIGN KEY(id_user_id) REFERENCES users(id),
+   FOREIGN KEY(id_book_id) REFERENCES books(id)
+);
+
 ```
 
 Les migrations principales:
@@ -186,46 +194,46 @@ Les migrations principales:
 ### 2.5 Schéma d'Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                      FRONTEND (Vue.js)                      │
-│  Login | Register | List Books | Detail Book | Comments    │
-└──────────────────────┬──────────────────────────────────────┘
-                       │
-                HTTP/JSON (REST API)
-                       │
-┌──────────────────────▼──────────────────────────────────────┐
-│                    BACKEND (AdonisJS)                       │
+┌──────────────────────────────────────────────────────────────┐
+│                      FRONTEND (Vue.js)                       │
+│  Login | Register | List Books | Detail Book | Comments      │
+└──────────────────────────┬───────────────────────────────────┘
+                           │
+                    HTTP/JSON (REST API)
+                           │
+┌──────────────────────────▼───────────────────────────────────┐
+│                    BACKEND (AdonisJS)                        │
 │                                                              │
-│  ┌────────────────────────────────────────────────────────┐ │
-│  │            Routes & Controllers                        │ │
-│  │  • AuthController (login, register, logout, profile)  │ │
-│  │  • LivresController (CRUD books)                       │ │
-│  │  • CommentairesController (CRUD comments)             │ │
-│  │  • RatesController (CRUD ratings)                     │ │
-│  └────────────────────────────────────────────────────────┘ │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │            Routes & Controllers                         │ │
+│  │  • AuthController (login, register, logout, profile)    │ │
+│  │  • LivresController (CRUD books)                        │ │
+│  │  • CommentairesController (CRUD comments)               │ │
+│  │  • RatesController (CRUD ratings)                       │ │
+│  └─────────────────────────────────────────────────────────┘ │
 │                           │                                  │
 │  ┌────────────────────────▼────────────────────────────────┐ │
 │  │         Middleware & Validation                         │ │
-│  │  • AuthMiddleware (JWT token verification)            │ │
-│  │  • ForceJsonResponseMiddleware (standardize responses) │ │
-│  │  • Validators (règles de validation)                  │ │
-│  └────────────────────────────────────────────────────────┘ │
+│  │  • AuthMiddleware (JWT token verification)              │ │
+│  │  • ForceJsonResponseMiddleware (standardize responses)  │ │
+│  │  • Validators (règles de validation)                    │ │
+│  └─────────────────────────────────────────────────────────┘ │
 │                           │                                  │
 │  ┌────────────────────────▼────────────────────────────────┐ │
 │  │    ORM Lucid & Models                                   │ │
-│  │  • User Model (auth provider)                          │ │
-│  │  • Livre Model (with relations)                        │ │
-│  │  • Commentaire Model (with relations)                  │ │
-│  │  • Rate Model (with relations)                         │ │
-│  └────────────────────────────────────────────────────────┘ │
-│                           │                                  │
-└──────────────────────┬────▼──────────────────────────────────┘
-                       │
-                    SQLite DB
-                       │
-        ┌──────────────┼──────────────┐
-        │              │              │
-    Users Tables  Books Tables  Comments Tables
+│  │  • User Model (auth provider)                           │ │
+│  │  • Livre Model (with relations)                         │ │
+│  │  • Commentaire Model (with relations)                   │ │
+│  │  • Rate Model (with relations)                          │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                            ▼                                 │
+└────────────────────────────┬─────────────────────────────────┘
+                             │
+                             DB
+                             │
+              ┌──────────────┼──────────────┐
+              │              │              │
+          Users Tables  Books Tables  Comments Tables
 ```
 
 ---
@@ -239,7 +247,7 @@ L'authentification est basée sur les **JWT (JSON Web Tokens)** fournis par Adon
 #### Flux d'authentification:
 
 1. **Registration:**
-   - L'utilisateur fournit username, email et password
+   - L'utilisateur fournit username et password
    - Le password est hashé avec **Scrypt**
    - Un nouvel utilisateur est créé en base de données
    - Un JWT est généré et retourné au client
@@ -355,7 +363,7 @@ async destroy({ params, response, auth }: HttpContext) {
 
 ### 4.1 Tests de l'API
 
-L'API a été testée avec **Bruno** (client REST similar à Postman) pour vérifier:
+L'API a été testée avec **Bruno** pour vérifier:
 
 - ✅ **Routes de base**: GET, POST, PUT, DELETE
 - ✅ **Authentification**: Login, Register, Logout, Protected Routes
@@ -379,33 +387,15 @@ L'API a été testée avec **Bruno** (client REST similar à Postman) pour véri
 - [ ] Ajouter une appréciation
 - [ ] Récupérer les appréciations d'un livre
 
-**[INSÉRER SCREENSHOTS Bruno ici]**
 
 ### 4.2 Utilisation de Bruno
 
-Bruno est utilisé pour tester automatiquement les endpoints de l'API. La collection Bruno contient:
+Bruno est utilisé pour tester les endpoints de l'API. La collection Bruno contient:
 
-- **Collection racine** (`Bruno/bruno.json`)
-- **Dossier Auth** (`Bruno/Auth/`):
-  - Login.bru
-  - Register.bru
-  - Logout.bru
-  - Voir le profile.bru
 
-- **Dossier Livres** (`Bruno/Livres/`):
-  - GET livre.bru (tous les livres)
-  - GET un livre.bru (détail)
-  - POST un livre.bru (créer)
-  - EDIT un livre.bru (modifier)
-  - DELETE un livre.bru (supprimer)
+![alt text](doc/image3.png)
 
-- **Dossier Commentaires** (`Bruno/Livres/comment/`):
-  - Get Comment.bru (récupérer)
-  - Post Comment.bru (ajouter)
-
-Tous les tests utilisent `auth: inherit` pour réutiliser le token obtenu lors du login.
-
-**[INSÉRER SCREENSHOTS des tests Bruno ici]**
+(/!\ A Mettre a jour)
 
 ---
 
@@ -470,8 +460,6 @@ Outils utilisés:
 - [ ] GitHub Copilot
 - [ ] Autre: _____________
 
-**Mentions spécifiques:**
-[Énumérer les contextes où l'IA a été utilisée et comment]
 
 Exemple:
 - Aide pour la structure du rapport
@@ -482,28 +470,6 @@ Exemple:
 
 ## Annexes
 
-### A. Structure du Projet
-
-```
-Passion-Lecture-Back/
-├── app/
-│   ├── controllers/          # Logique métier des endpoints
-│   ├── models/               # Modèles Lucid ORM
-│   ├── validators/           # Règles de validation VineJS
-│   ├── middleware/           # Middlewares personnalisés
-│   └── exceptions/           # Gestion des exceptions
-├── config/                   # Configuration (auth, db, cors, etc)
-├── database/
-│   ├── migrations/           # Migrations pour créer les tables
-│   └── seeders/              # Données initiales
-├── start/
-│   ├── routes.ts             # Définition des routes
-│   ├── kernel.ts             # Configuration middleware
-│   └── env.ts                # Variables d'environnement
-├── Bruno/                    # Collection des tests API
-├── package.json              # Dépendances NPM
-└── rapport.md               # Ce rapport
-```
 
 ### B. Installation et Démarrage
 
@@ -527,17 +493,15 @@ npm start
 
 ### C. Variables d'Environnement (.env)
 
-```
+```js
 NODE_ENV=development
 APP_KEY=generated_key_here
-DB_CONNECTION=sqlite
-SQLITE_FILENAME=./database.sqlite
-SESSION_DRIVER=memory
+DB_CONNECTION=mysql
 ```
 
 ---
 
-**Rapport réalisé le:** [DATE]  
-**Apprentis:** [Noms]  
-**Chef de Projet:** [Nom]
+**Rapport réalisé le:** 12/05/2026  
+**Apprentis:** M. Rochat, M. Ruberti  
+**Chef de Projet:** M. Mveng
 
