@@ -25,11 +25,12 @@ Cette API alimente l’application Passion Lecture avec une gestion complète de
 
 | Technologie | Usage |
 | :--- | :--- |
-| ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white) | Langage principal |
-| ![AdonisJS](https://img.shields.io/badge/AdonisJS-5A45FF?style=flat-square&logo=adonisjs&logoColor=white) | Framework backend |
-| ![Lucid ORM](https://img.shields.io/badge/Lucid-2F855A?style=flat-square) | Accès et modèle de données |
-| ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=flat-square&logo=swagger&logoColor=black) | Documentation API |
-| ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white) | Base de données cible |
+| ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white) | Langage principal pour un code robuste et typé |
+| ![AdonisJS](https://img.shields.io/badge/AdonisJS-5A45FF?style=flat-square&logo=adonisjs&logoColor=white) | Framework backend (v6) utilisé pour l'architecture MVC et l'API |
+| ![Lucid ORM](https://img.shields.io/badge/Lucid-2F855A?style=flat-square) | Gestionnaire de base de données et patterns Active Record |
+| ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=flat-square&logo=swagger&logoColor=black) | Documentation interactive de l'API |
+| ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white) | Base de données relationnelle pour la production |
+| ![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white) | Base de données locale pour le développement et les tests |
 
 ## 🚀 Installation & Lancement
 
