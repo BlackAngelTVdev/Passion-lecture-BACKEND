@@ -1,0 +1,18 @@
+meta {
+  name: GET livre Search
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:3333/books?search=1984
+  body: none
+  auth: inherit
+}
+
+params:query {
+  search: 1984
+  ~search: George Orwell
+  ~search: Seuil
+  ~search: Big Brother vous regarde.
+}

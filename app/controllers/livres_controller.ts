@@ -3,14 +3,28 @@ import Livre from '#models/livre'
 import { createLivreValidator, updateLivreValidator } from '#validators/livre'
 
 export default class LivresController {
-  async index({ response }: HttpContext) {
-    const livres = await Livre.query()
-      .preload('commentaires', (commentQuery) => {
-        commentQuery.preload('auteur', (userQuery) => {
-          userQuery.select(['id', 'username'])
-        })
+async index({ request, response }: HttpContext) {
+    // Récupérer le terme de recherche (ex: ?search=quelquechose)
+    const { search } = request.qs()
+
+    // Créer la requête de base
+    const query = Livre.query()
+
+    // Appliquer le filtre si 'search' existe
+    if (search) {
+      query.where((db) => {
+        db.where('titre', 'like', `%${search}%`)
+          .orWhere('resume', 'like', `%${search}%`)
+          .orWhere('auteur', 'like', `%${search}%`)
+          .orWhere('editeur', 'like', `%${search}%`)
       })
+    }
+
+    // Garder les preloads
+    const livres = await query
+      .preload('commentaires', (q) => q.preload('auteur', (u) => u.select('id', 'username')))
       .preload('rates')
+
     return response.ok(livres)
   }
 
