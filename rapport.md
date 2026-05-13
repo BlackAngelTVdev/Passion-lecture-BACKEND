@@ -71,8 +71,8 @@ L'API REST expose les endpoints suivants :
 ```json
 {
   "message": "Login successful",
-  "token": "token_jwt_here",
-  "accessToken": "token_jwt_here",
+  "token": "token_OAT_here",
+  "accessToken": "token_OAT_here",
   "user": {
     "id": 1,
     "username": "Admin",
@@ -214,7 +214,7 @@ Les migrations principales:
 │                           │                                  │
 │  ┌────────────────────────▼────────────────────────────────┐ │
 │  │         Middleware & Validation                         │ │
-│  │  • AuthMiddleware (JWT token verification)              │ │
+│  │  • AuthMiddleware (OAT token verification)              │ │
 │  │  • ForceJsonResponseMiddleware (standardize responses)  │ │
 │  │  • Validators (règles de validation)                    │ │
 │  └─────────────────────────────────────────────────────────┘ │
@@ -242,7 +242,7 @@ Les migrations principales:
 
 ### 3.1 Gestion de l'Authentification
 
-L'authentification est basée sur les **JWT (JSON Web Tokens)** fournis par AdonisJS.
+L'authentification est basée sur les **OAT (Open Access Token)**
 
 #### Flux d'authentification:
 
@@ -250,12 +250,12 @@ L'authentification est basée sur les **JWT (JSON Web Tokens)** fournis par Adon
    - L'utilisateur fournit username et password
    - Le password est hashé avec **Scrypt**
    - Un nouvel utilisateur est créé en base de données
-   - Un JWT est généré et retourné au client
+   - Un OAT est généré et retourné au client
 
 2. **Login:**
    - L'utilisateur fournit username et password
    - Le système vérifie les credentials avec `User.verifyCredentials()`
-   - Un JWT est créé via `User.accessTokens.create(user)`
+   - Un OAT est créé via `User.accessTokens.create(user)`
    - Le token est retourné au client et stocké en localStorage
 
 3. **Protected Requests:**
@@ -331,7 +331,7 @@ async destroy({ params, response, auth }: HttpContext) {
 - Fonction native d'AdonisJS
 - Impossible de récupérer le password original
 
-#### **3. Authentification JWT:**
+#### **3. Authentification OAT:**
 - Tokens signés et vérifiés
 - Expiration configurable
 - Tokens révoqués à la déconnexion
@@ -403,11 +403,11 @@ Bruno est utilisé pour tester les endpoints de l'API. La collection Bruno conti
 
 ### 5.1 Conclusion Générale
 
-Le projet "Passion Lecture" a été réalisé avec succès. Le backend expose une API REST robuste et documentée permettant une gestion complète des livres, utilisateurs et commentaires. L'authentification par JWT, la validation des données et les contrôles d'accès assurent la sécurité et l'intégrité de l'application.
+Le projet "Passion Lecture" a été réalisé avec succès. Le backend expose une API REST robuste et documentée permettant une gestion complète des livres, utilisateurs et commentaires. L'authentification par OAT, la validation des données et les contrôles d'accès assurent la sécurité et l'intégrité de l'application.
 
 Les principales réalisations:
 - ✅ API REST complète avec CRUD pour tous les entités
-- ✅ Authentification JWT sécurisée
+- ✅ Authentification OAT sécurisée
 - ✅ Validation robuste de toutes les données
 - ✅ Gestion des rôles (User/Admin)
 - ✅ Middleware et error handling standardisés
@@ -446,60 +446,26 @@ Le projet a été réalisé en plusieurs phases bien distinctes:
 - [AdonisJS Documentation](https://docs.adonisjs.com)
 - [VineJS - Validation](https://vinejs.dev)
 - [SQLite Official](https://www.sqlite.org)
-- [JWT Introduction](https://jwt.io)
 - [REST API Best Practices](https://restfulapi.net)
 - [OWASP Security Guidelines](https://owasp.org)
 - [HTTP Status Codes](https://httpwg.org/specs/rfc7231.html#status.codes)
+- [HTTP cat](https://http.cat)
 
 ### 6.2 Utilisation de l'IA
 
-**Recours à l'IA:** Oui / Non [À compléter]
+**Recours à l'IA:** Oui
 
 Outils utilisés:
-- [ ] ChatGPT
+- [ ] Gemini
 - [ ] GitHub Copilot
-- [ ] Autre: _____________
-
+- [ ] Claude Code
 
 Exemple:
+- Commentaires de code
+- Diagnostique de bug
 - Aide pour la structure du rapport
-- Génération de code boilerplate pour les migrations
-- Explications sur les concepts TypeScript
-
 ---
 
-## Annexes
-
-
-### B. Installation et Démarrage
-
-```bash
-# Installation des dépendances
-npm install
-
-# Migration de la base de données
-node ace migration:run
-
-# Seeding des données initiales (optionnel)
-node ace seed:run
-
-# Démarrage du serveur
-npm run dev
-
-# Compilé pour production
-npm run build
-npm start
-```
-
-### C. Variables d'Environnement (.env)
-
-```js
-NODE_ENV=development
-APP_KEY=generated_key_here
-DB_CONNECTION=mysql
-```
-
----
 
 **Rapport réalisé le:** 12/05/2026  
 **Apprentis:** M. Rochat, M. Ruberti  
