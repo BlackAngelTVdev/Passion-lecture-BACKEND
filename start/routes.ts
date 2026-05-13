@@ -1,6 +1,7 @@
 import router from '@adonisjs/core/services/router'
 import AutoSwagger from 'adonis-autoswagger'
 import swaggerConfig from '#config/swagger'
+import { middleware } from '#start/kernel'
 
 const LivresController = () => import('#controllers/livres_controller')
 const AuthController = () => import('#controllers/auth_controller')
@@ -32,6 +33,8 @@ router.get('/books', [LivresController, 'index'])
 router.get('/books/:id', [LivresController, 'show'])
 router.get('/books/:id/comments', [CommentairesController, 'index'])
 router.get('/books/:bookId/rates', [RatesController, 'index'])
+router.get('/books/:id/comments/:commentId', [CommentairesController, 'show'])
+router.get('/books/:bookId/rates/:id', [RatesController, 'show'])
 
 // Protected routes (require authentication)
 router
@@ -45,17 +48,14 @@ router
     router.put('/books/:id', [LivresController, 'update'])
     router.delete('/books/:id', [LivresController, 'destroy'])
 
-
-  })
-  .middleware([() => import('#middleware/auth_middleware')])
-      // Comments operations
+    // Comments operations
     router.post('/books/:id/comments', [CommentairesController, 'store'])
-    router.get('/books/:id/comments/:commentId', [CommentairesController, 'show'])
     router.put('/books/:id/comments/:commentId', [CommentairesController, 'update'])
     router.delete('/books/:id/comments/:commentId', [CommentairesController, 'destroy'])
 
     // Rating routes
     router.post('/books/:bookId/rates', [RatesController, 'store'])
-    router.get('/books/:bookId/rates/:id', [RatesController, 'show'])
     router.put('/books/:bookId/rates/:id', [RatesController, 'update'])
     router.delete('/books/:bookId/rates/:id', [RatesController, 'destroy'])
+  })
+  .middleware([middleware.auth()])

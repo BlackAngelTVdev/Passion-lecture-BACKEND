@@ -23,7 +23,7 @@ export default class extends BaseSchema {
       table.string('categorie').notNullable()
       table.string('editeur').notNullable()
       table.string('auteur').notNullable()
-      table.string('epub').notNullable()
+      table.string('epub')
 
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
