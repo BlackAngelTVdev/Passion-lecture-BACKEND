@@ -1,0 +1,20 @@
+meta {
+  name: Delete Comment
+  type: http
+  seq: 5
+}
+
+delete {
+  url: http://localhost:3333/books/1/comments/1
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: oat_Mg.em1Uc3NSSkxjWkRlTm5GRmpQazExX21Lb3VydDN5cjI5cTh3VDJHVTE5MzM0Mjc3MDY
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
