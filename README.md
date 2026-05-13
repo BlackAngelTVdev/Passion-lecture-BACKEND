@@ -102,6 +102,9 @@ Exemples de routes utiles:
 **BlackAngelTVdev**
 ![Follow](https://img.shields.io/github/followers/BlackAngelTVdev?label=Follow%20Me&style=social)
 
+**Gianmarco-Ruberti**
+![Follow](https://img.shields.io/github/followers/Gianmarco-Ruberti?label=Follow%20Me&style=social)
+
 ---
 
 ## 📄 Licence
