@@ -1,0 +1,21 @@
+meta {
+  name: Post Rate
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3333/books/1/rates
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "value": 4
+  }
+}
+
+settings {
+  encodeUrl: true
+}
