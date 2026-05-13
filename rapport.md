@@ -186,38 +186,38 @@ Les migrations principales:
 ### 2.5 Schéma d'Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                      FRONTEND (Vue.js)                      │
-│  Login | Register | List Books | Detail Book | Comments    │
-└──────────────────────┬──────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                      FRONTEND (Vue.js)                       │
+│  Login | Register | List Books | Detail Book | Comments      │
+└──────────────────────┬───────────────────────────────────────┘
                        │
                 HTTP/JSON (REST API)
                        │
-┌──────────────────────▼──────────────────────────────────────┐
-│                    BACKEND (AdonisJS)                       │
+┌──────────────────────▼───────────────────────────────────────┐
+│                    BACKEND (AdonisJS)                        │
 │                                                              │
-│  ┌────────────────────────────────────────────────────────┐ │
-│  │            Routes & Controllers                        │ │
-│  │  • AuthController (login, register, logout, profile)  │ │
-│  │  • LivresController (CRUD books)                       │ │
-│  │  • CommentairesController (CRUD comments)             │ │
-│  │  • RatesController (CRUD ratings)                     │ │
-│  └────────────────────────────────────────────────────────┘ │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │            Routes & Controllers                         │ │
+│  │  • AuthController (login, register, logout, profile)    │ │
+│  │  • LivresController (CRUD books)                        │ │
+│  │  • CommentairesController (CRUD comments)               │ │
+│  │  • RatesController (CRUD ratings)                       │ │
+│  └─────────────────────────────────────────────────────────┘ │
 │                           │                                  │
 │  ┌────────────────────────▼────────────────────────────────┐ │
 │  │         Middleware & Validation                         │ │
-│  │  • AuthMiddleware (JWT token verification)            │ │
-│  │  • ForceJsonResponseMiddleware (standardize responses) │ │
-│  │  • Validators (règles de validation)                  │ │
-│  └────────────────────────────────────────────────────────┘ │
+│  │  • AuthMiddleware (JWT token verification)              │ │
+│  │  • ForceJsonResponseMiddleware (standardize responses)  │ │
+│  │  • Validators (règles de validation)                    │ │
+│  └─────────────────────────────────────────────────────────┘ │
 │                           │                                  │
 │  ┌────────────────────────▼────────────────────────────────┐ │
 │  │    ORM Lucid & Models                                   │ │
-│  │  • User Model (auth provider)                          │ │
-│  │  • Livre Model (with relations)                        │ │
-│  │  • Commentaire Model (with relations)                  │ │
-│  │  • Rate Model (with relations)                         │ │
-│  └────────────────────────────────────────────────────────┘ │
+│  │  • User Model (auth provider)                           │ │
+│  │  • Livre Model (with relations)                         │ │
+│  │  • Commentaire Model (with relations)                   │ │
+│  │  • Rate Model (with relations)                          │ │
+│  └─────────────────────────────────────────────────────────┘ │
 │                           │                                  │
 └──────────────────────┬────▼──────────────────────────────────┘
                        │
